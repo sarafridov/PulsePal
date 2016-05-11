@@ -1,13 +1,17 @@
+# Author: Sara Fridovich-Keil (partners: Ben Cohen and Zach Stecker) 
+# final project for COS 426: Computer Graphics
+# execution in Terminal: python FastFingerFrame.py fingervideo.mov
+# see readme for tips on good input videos
+
 import cv2
 import math
 import numpy as np
 import sys
 
-# frames = []
 sigma = 10 # how many pixels up and down to look
 colorlines = [] # array of arrays, where each element is a frame and each subarray has red values across width
 frames_elapsed = 0
-threshold = 250 # this can change
+threshold = 250 # this can change--just starting default value
 transitions = [] # array where each entry is the transition x value for that frame
 avg = 0
 amplifyratio = 5
@@ -36,8 +40,7 @@ def amplifyTransitions():
 	for transition in transitions:
 		difference = transition - avg
 		amplifiedDiff = difference * amplifyratio
-		amplifiedTrans = transition + amplifiedDiff
-		amplifiedTransitions.append(amplifiedDiff) # try just doing difference
+		amplifiedTransitions.append(amplifiedDiff)
 
 # get average transition point across all frames
 def getAverageTransition():
@@ -79,7 +82,6 @@ def getTransitions():
 		transitions.append(transition)		
 
 # average across a swath of pixels horizontally
-# return a tuple with the red values across the width
 def getColorlines(frame):
 	global sigma
 	global colorlines
@@ -101,12 +103,9 @@ def getColorlines(frame):
 	colorlines.append(colorline)		
 
 # Read in video and parse it into frames
-# Save all the frames in global variable "frames" to process later together
 videoname = sys.argv[1]
-# videoname = 'BenFinger.mov'
 video = cv2.VideoCapture(videoname)
 pos_frame = video.get(cv2.cv.CV_CAP_PROP_POS_FRAMES)
-# duration = int(sys.argv[2])
 
 frame_rate = int(math.ceil(video.get(cv2.cv.CV_CAP_PROP_FPS)))
 
@@ -116,9 +115,7 @@ while True:
 	if flag:
 		frames_elapsed += 1
 		pos_frame = video.get(cv2.cv.CV_CAP_PROP_POS_FRAMES)
-		# frames.append(frame)
 		getColorlines(frame)
-		# print frames_elapsed
 	else:
 		# frame not ready; try again	
 		video.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, pos_frame-1)
@@ -131,7 +128,7 @@ while True:
 	if video.get(cv2.cv.CV_CAP_PROP_POS_FRAMES)	== video.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT):
 		break
 
-print "done reading in video and finding colorlines"
+# print "done reading in video and finding colorlines"
 
 # for frame in frames:
 # 	getColorlines(frame)
@@ -145,21 +142,21 @@ chooseThreshold()
 
 getTransitions()
 
-print "done getting transitions"
+# print "done getting transitions"
 
 # for item in transitions:
 # 	print item
 
 getAverageTransition()
 
-print "done getting average transition"
+# print "done getting average transition"
 
 amplifyTransitions()
 
 # for item in amplifiedTransitions:
 # 	print item
 
-print "done amplifying transitions"
+# print "done amplifying transitions"
 
 duration = int(frames_elapsed/frame_rate)
 
